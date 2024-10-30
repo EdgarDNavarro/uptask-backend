@@ -5,8 +5,11 @@ import { handleInputErrors } from "../middleware/validation";
 import { TaskController } from "../controllers/TaskController";
 import { projectExists } from "../middleware/project";
 import { taskBelongsToProject, taskExists } from "../middleware/task";
+import { authenticate } from "../middleware/auth";
+import { TeamMemberController } from "../controllers/TeamController";
 
 const router = Router()
+router.use(authenticate)
 router.param('projectId', projectExists)
 router.param('taskId', taskExists)
 router.param('taskId', taskBelongsToProject)
@@ -86,6 +89,20 @@ router.post('/:projectId/tasks/:taskId/status',
     body('status').notEmpty().withMessage("El estado es obligatorio"),
     handleInputErrors,
     TaskController.updateStatus
+)
+
+/**For Team */
+
+router.post('/:projectId/team/find',
+    body('email').isEmail().toLowerCase().withMessage("Email no valido"),
+    handleInputErrors,
+    TeamMemberController.findMemberByEmail
+)
+
+router.post('/:projectId/team',
+    body('id').isMongoId().withMessage("id no valido"),
+    handleInputErrors,
+    TeamMemberController.addMemeberById
 )
 
 export default router
