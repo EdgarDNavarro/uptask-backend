@@ -32,3 +32,12 @@ export async function taskBelongsToProject(req:Request, res:Response, next:NextF
     }
     next()
 }
+
+export async function hasAuthorization(req:Request, res:Response, next:NextFunction) {
+    if(req.user.id.toString() !== req.project.manager.toString()) {
+        const error = new Error('Accion no valida, no tienes permiso para hacer eso')
+        res.status(400).json({error: error.message})
+        return
+    }
+    next()
+}

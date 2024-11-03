@@ -86,7 +86,7 @@ export class AuthController {
                     token: token.token
                 })
 
-                const error = new Error('Hemos enviado un e-amil de confirmacion')
+                const error = new Error('tu cuenta no esta verificada, Hemos enviado un email de confirmacion')
                 res.status(401).json({error: error.message})
                 return
             }
