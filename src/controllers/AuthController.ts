@@ -209,4 +209,64 @@ export class AuthController {
         res.json(req.user)
         return 
     }
+
+    static updateProfile = async (req: Request, res: Response) => {
+        const { name, email } = req.body
+
+        try {
+            const userExists = await User.findOne({email})
+            if(userExists && userExists.id.toString() !== req.user.id) {
+                const error = new Error("Ese email ya esta registrado")
+                res.status(409).json({error: error.message})
+                return 
+            }
+
+            req.user.name = name
+            req.user.email = email
+
+            await req.user.save()
+            res.send('perfil actualizado correctamente')
+        } catch (error) {
+            res.status(500).json({error: "Hubo un error"})
+        }
+    }
+
+    static updateCurrentUserPassword = async (req: Request, res: Response) => {
+        const { password, current_password } = req.body
+
+        try {
+            const user = await User.findById(req.user.id)
+            const isPasswordCorrect = await checkPassword(current_password, user.password)
+            
+            if(!isPasswordCorrect) {
+                const error = new Error("El password actual es incorrecto")
+                res.status(401).json({error: error.message})
+                return 
+            }
+
+            user.password = await hashPassword(password)
+            await user.save()
+            res.send('password actualizado correctamente')
+        } catch (error) {
+            res.status(500).json({error: "Hubo un error"})
+        }
+    }
+    static checkPassword = async (req: Request, res: Response) => {
+        const { password } = req.body
+
+        try {
+            const user = await User.findById(req.user.id)
+            const isPasswordCorrect = await checkPassword(password, user.password)
+            
+            if(!isPasswordCorrect) {
+                const error = new Error("El password es incorrecto")
+                res.status(401).json({error: error.message})
+                return 
+            }
+
+            res.send('password correcto')
+        } catch (error) {
+            res.status(500).json({error: "Hubo un error"})
+        }
+    }
 }

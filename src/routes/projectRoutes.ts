@@ -31,18 +31,20 @@ router.get('/:id',
     ProjectController.getProjectById
 )
 
-router.put('/:id', 
-    param("id").isMongoId().withMessage("Ese id no es valido"),
+router.put('/:projectId', 
+    param("projectId").isMongoId().withMessage("Ese id no es valido"),
     body("projectName").notEmpty().withMessage("El nombre de proyecto es obligatorio"),
     body("clientName").notEmpty().withMessage("El nombre del cliente es obligatorio"),
     body("description").notEmpty().withMessage("La descripcion es obligatoria"),
     handleInputErrors,
+    hasAuthorization,
     ProjectController.updateProject
 )
 
-router.delete('/:id', 
-    param("id").isMongoId().withMessage("Ese id no es valido"),
+router.delete('/:projectId', 
+    param("projectId").isMongoId().withMessage("Ese id no es valido"),
     handleInputErrors,
+    hasAuthorization,
     ProjectController.deleteProyect
 )
 
